@@ -67,7 +67,7 @@ function updateLiveCharts(data) {
     return;
   }
   const labels = [];
-
+  const tLabels = [];
   const PM10_VALUES = [];
   const PM2_5_VALUES = [];
   const O3_VALUES = [];
@@ -95,12 +95,8 @@ function updateLiveCharts(data) {
   // Skip header row (assumed first row)
   for (let i = 1; i < data.length; i++) {
     if (data[i].length < 6) continue;
-    labels.push(data[i][0]); // Timestamp
-    // mq4Values.push(parseFloat(data[i][1]));
-    // mq131Values.push(parseFloat(data[i][2]));
-    // mq7Values.push(parseFloat(data[i][3]));
-    // mq135Values.push(parseFloat(data[i][4]));
-    // mics6814Values.push(parseFloat(data[i][5]));
+    labels.push(data[i][1]); // Timestamp
+    
     PM10_VALUES.push(parseFloat(data[i][6]));
     PM2_5_VALUES.push(parseFloat(data[i][5]));
     O3_VALUES.push(parseFloat(data[i][7]));
@@ -121,27 +117,27 @@ function updateLiveCharts(data) {
     AQI_PM2_5_VALUES.push(parseFloat(data[i][21]));
     AQI_PM10_VALUES.push(parseFloat(data[i][22]));
   }
-
+  tLabels.push(data[1][0]);	//Date
   console.log("Labels:", labels);
   console.log("VOC values:", VOC_VALUES);
 
-  createOrUpdateChart("PM2_5_CHART", "PM₂.₅", labels, PM2_5_VALUES, "red", "µg/m³");
-  createOrUpdateChart("PM10_CHART", "PM₁₀", labels, PM10_VALUES, "blue", "µg/m³");
-  createOrUpdateChart("O3_CHART", "OZONE (O₃)", labels, O3_VALUES, "green", "ppm");
-  createOrUpdateChart("CO_CHART", "CARBON MONOXIDE (CO)", labels, CO_VALUES, "purple", "ppm");
-  createOrUpdateChart("CO2_CHART", "CARBON DIOXIDE (CO₂)", labels, CO2_VALUES, "orange", "ppm");
-  createOrUpdateChart("CH4_CHART", "METHANE (CH₄)", labels, CH4_VALUES, "red", "ppm");
-  createOrUpdateChart("NH3_CHART", "AMMONIA (NH₃)", labels, NH3_VALUES, "blue", "ppm");
-  createOrUpdateChart("VOC_CHART", "VOC", labels, VOC_VALUES, "green", "ppm");
-  createOrUpdateChart("NO2_CHART", "NITROGEN DI OXIDE (NO₂)", labels, NO2_VALUES, "purple", "ppm");
+  createOrUpdateChart("PM2_5_CHART", "PM₂.₅", labels, PM2_5_VALUES, "red", "µg/m³", tLabels);
+  createOrUpdateChart("PM10_CHART", "PM₁₀", labels, PM10_VALUES, "blue", "µg/m³", tLabels);
+  createOrUpdateChart("O3_CHART", "OZONE (O₃)", labels, O3_VALUES, "green", "ppm", tLabels);
+  createOrUpdateChart("CO_CHART", "CARBON MONOXIDE (CO)", labels, CO_VALUES, "purple", "ppm", tLabels);
+  createOrUpdateChart("CO2_CHART", "CARBON DIOXIDE (CO₂)", labels, CO2_VALUES, "orange", "ppm", tLabels);
+  createOrUpdateChart("CH4_CHART", "METHANE (CH₄)", labels, CH4_VALUES, "red", "ppm", tLabels);
+  createOrUpdateChart("NH3_CHART", "AMMONIA (NH₃)", labels, NH3_VALUES, "blue", "ppm", tLabels);
+  createOrUpdateChart("VOC_CHART", "VOC", labels, VOC_VALUES, "green", "ppm", tLabels);
+  createOrUpdateChart("NO2_CHART", "NITROGEN DI OXIDE (NO₂)", labels, NO2_VALUES, "purple", "ppm", tLabels);
 
-  createOrUpdateChart("TEMP_CHART", "TEMPERATURE", labels, TEMPERATURE_VALUES, "orange", "°C");
-  createOrUpdateChart("PRESSURE_CHART", "PRESSURE", labels, PRESSURE_VALUES, "red", "Pa");
-  createOrUpdateChart("HUMID_CHART", "HUMIDITY", labels, HUMIDITY_VALUES, "blue", "%");
-  createOrUpdateChart("WIND_CHART", "WINDSPEED", labels, WINDSPEED_VALUES, "green", "m/s");
+  createOrUpdateChart("TEMP_CHART", "TEMPERATURE", labels, TEMPERATURE_VALUES, "orange", "°C", tLabels);
+  createOrUpdateChart("PRESSURE_CHART", "PRESSURE", labels, PRESSURE_VALUES, "red", "Pa", tLabels);
+  createOrUpdateChart("HUMID_CHART", "HUMIDITY", labels, HUMIDITY_VALUES, "blue", "%", tLabels);
+  createOrUpdateChart("WIND_CHART", "WINDSPEED", labels, WINDSPEED_VALUES, "green", "m/s", tLabels);
 }
 
-function createOrUpdateChart(canvasId, label, labels, dataValues, color, yAxisParameter) {
+function createOrUpdateChart(canvasId, label, labels, dataValues, color, yAxisParameter, timeLabel) {
   const canvasElem = document.getElementById(canvasId);
   if (!canvasElem) return; // Exit if the canvas is missing
 
@@ -176,7 +172,7 @@ function createOrUpdateChart(canvasId, label, labels, dataValues, color, yAxisPa
           x: {
             title: {
               display: true,
-              text: "Time",
+              text: ("Time/Date" + "\t" + "(" + timeLabel + ")"),
             },
             grid: {
               color: "#ccc", // Light grid lines for visibility
@@ -210,7 +206,7 @@ function fetchMultiParameterData() {
       // Get the most recent date
       const dateList = rows.slice(1).map(row => row[0]?.split(" ")[0]).filter(Boolean);
       const latestDate = dateList[dateList.length - 1];
-
+      const tLabel = [];
       // Filter only rows from latest date
       const todayRows = rows.filter((row, index) => {
         if (index === 0) return true;
@@ -230,7 +226,7 @@ function fetchMultiParameterData() {
 
       for (let i = 1; i < todayRows.length; i++) {
         if (todayRows[i].length < header.length) continue;
-        labels.push(todayRows[i][0]);
+        labels.push(todayRows[i][1]);
         for (let col = 18; col < header.length; col++) {
           //parameters[col].push(parseFloat(todayRows[i][col]));
 		   if(col < 21)
@@ -239,42 +235,74 @@ function fetchMultiParameterData() {
             PM_parameters[col].push(parseFloat(todayRows[i][col]));
         }
       }
-
+	    tLabel.push(todayRows[1][0]);
             const colors = ["red", "blue", "green", "purple", "orange", "brown"];
       const datasets = [];
       const PM_datasets = [];
       let colorIndex = 0;
       for (let col = 18; col < header.length; col++) {
-        if(col < 21) {
+        switch(col) {
+          case 18:
           datasets.push({
-            label: header[col], // e.g., "ParameterA"
+            label: "AQI (O₃)", // e.g., "ParameterA"
             data: parameters[col],
             borderColor: colors[colorIndex % colors.length],
             borderWidth: 2,
             fill: false,
           });
           colorIndex++;
-        }
-        else if(col > 20) {
+          break;
+          case 19:
+            datasets.push({
+              label: "AQI (CO)", // e.g., "ParameterA"
+              data: parameters[col],
+              borderColor: colors[colorIndex % colors.length],
+              borderWidth: 2,
+              fill: false,
+            });
+            colorIndex++;
+          break;
+          case 20:
+            datasets.push({
+              label: "AQI (NO)", // e.g., "ParameterA"
+              data: parameters[col],
+              borderColor: colors[colorIndex % colors.length],
+              borderWidth: 2,
+              fill: false,
+            });
+            colorIndex++;
+          break;
+          case 21:
           PM_datasets.push({
-            label: header[col], // e.g., "ParameterA"
+            label: "PM₂.₅", // e.g., "ParameterA"
             data: PM_parameters[col],
             borderColor: colors[colorIndex % colors.length],
             borderWidth: 2,
             fill: false,
           });
           colorIndex++;
+          break;
+          case 22:
+            PM_datasets.push({
+            label: "PM₁₀", // e.g., "ParameterA"
+            data: PM_parameters[col],
+            borderColor: colors[colorIndex % colors.length],
+            borderWidth: 2,
+            fill: false,
+          });
+          colorIndex++;
+            break;
         }
       }
       
 
-      createMultiParameterChart("AQI_CHART", "AQI", labels, datasets);
-      createMultiParameterChart("PM_AQI_CHART", "PM_AQI", labels, PM_datasets);
+      createMultiParameterChart("AQI_CHART", "AQI", labels, datasets, tLabel);
+      createMultiParameterChart("PM_AQI_CHART", "PM_AQI", labels, PM_datasets, tLabel);
     })
     .catch(error => console.error("Error fetching multi-parameter data:", error));
 }
 
-function createMultiParameterChart(canvasId, chartTitle, labels, datasets) {
+function createMultiParameterChart(canvasId, chartTitle, labels, datasets, timeLabel) {
   const canvasElem = document.getElementById(canvasId);
   if (!canvasElem) return;
   const ctx = canvasElem.getContext("2d");
@@ -306,7 +334,7 @@ function createMultiParameterChart(canvasId, chartTitle, labels, datasets) {
         x: {
           title: {
             display: true,
-            text: "Time"
+            text: ("Time/Date" + "\t" + "(" + timeLabel + ")"),
           }
         },
         y: {
