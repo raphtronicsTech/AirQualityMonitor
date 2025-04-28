@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Air Quality Monitoring - Download</title>
+  <title>IoT Air Quality Monitoring - Download</title>
   <link rel="stylesheet" href="styles.css" />
   <!-- No need for jsPDF since we're using a direct PDF link -->
 </head>
@@ -18,12 +18,25 @@
     </ul>
     
   </nav>
-  <section class="download">
-    <h2>Download Air Quality Data Report (XLSX)</h2>
-    <p>Click the link below to download the latest .xlsx report.</p>
-    <!-- Replace the href with your published PDF URL -->
-    <a id="pdfDownloadLink" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR3GXYy7a5yMsToVzdIzuqFunVfWwZUfUfgUPiCMTTEyzl4aUHa9AvwzSZHRK6WUKmoSQPCLIzrzPl0/pub?output=xlsx" target="_blank" download>Download PDF Report</a>
-  </section>
+<section class="download">
+  <h2>Download IoT Air Quality Monitoring System Data Report</h2>
+
+  <div>
+    <label for="dateSelect">Select Date (DD-MM-YYYY):</label>
+    <input type="date" id="dateSelect" />
+    <button id="downloadSelectedDateBtn">Download Selected Date (XLSX)</button>
+  </div>
+
+  <hr>
+
+  <h3>Download Full Report</h3>
+  <a id="pdfDownloadLink" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR3GXYy7a5yMsToVzdIzuqFunVfWwZUfUfgUPiCMTTEyzl4aUHa9AvwzSZHRK6WUKmoSQPCLIzrzPl0/pub?output=xlsx" target="_blank" download>
+    Download Full Report (XLSX)
+  </a>
+</section>
+  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
